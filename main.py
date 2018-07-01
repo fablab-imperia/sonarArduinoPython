@@ -7,22 +7,31 @@ Created on Sat Jun 30 16:30:52 2018
 """
 
 import serial
+import matplotlib.pyplot as plt
 
-port=str(input("Inserire percorso intrerfaccia: "))
+dizDati={}
 
+port=str(input("Inserire percorso interfaccia: "))
 ard = serial.Serial(port,9600,timeout=5)
-
+ard.flush()
 while True:
-    ard.flush()
-    msg = str(ard.readline())
-    msg = msg.replace("b'", "")
-    msg = msg.rstrip()
-    try:
+    msg = ard.readline()
+    msg.translate(None ,b'\r\n')
+    msg = msg.decode("utf-8")
+    if msg.count("-")==1:
+#        print(msg)
         angolo, distanza = msg.split("-")
-        angolo= float(angolo)
+#        print(type(angolo))
+        distanza=distanza.replace("\r\n","")
+        angolo= int(angolo)
         distanza=float(distanza)
-        distanza = distanza.rstrip()
-    except:
+        dizDati[angolo]=distanza
+        print("Angolo "+str(angolo)+", distanza "+str(distanza))
+    else:
         pass
+    valoriRaggi = []
+    for ang in sorted(dizDati.keys()):
+        valoriRaggi.append(dizDati[ang])
+    plt.plot(sorted(dizDati.keys()), valoriRaggi)
     
-    print("Angolo: "+angolo+", distanza: "+distanza)
+    plt.show()
