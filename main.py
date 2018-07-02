@@ -9,6 +9,8 @@ Created on Sat Jun 30 16:30:52 2018
 import serial
 import matplotlib.pyplot as plt
 import easygui
+import math
+
 
 #Arduino seriale
 port= easygui.enterbox("Inserisci il percorso per la porta Arduino, tipicamente /dev/ttyACM*")
@@ -19,11 +21,19 @@ ard = serial.Serial(port,9600,timeout=5)
 
 ard.flush()
 
+#Tipo di grafico
+tipoDiGrafico = easygui.buttonbox("Seleziona come vuoi che vengano mostrati i dati", choices=["Grafico radiale","Cartesiano r in funzione di teta"])
+if tipoDiGrafico==None or tipoDiGrafico=="Cartesiano r in funzione di teta":
+    tipoDiGrafico="cartesiano"
+else:
+    tipoDiGrafico="radiale"
+
 ##Grafico
 dizDati={}
 plt.ion()
 fig=plt.figure()
 ax=fig.add_subplot(111)
+
 
 #Ciclo principale
 while True:
@@ -44,5 +54,17 @@ while True:
     valoriRaggi = []
     for ang in sorted(dizDati.keys()):
         valoriRaggi.append(dizDati[ang])
+       
+    x=[]
+    y=[]
+    if (tipoDiGrafico=="radiale"):
+        for i in range(len(valoriRaggi)):
+            x.append(valoriRaggi[i]*math.cos(sorted(dizDati.keys())[i]*math.pi/180.0))
+            y.append(valoriRaggi[i]*math.sin(sorted(dizDati.keys())[i]*math.pi/180.0))
+    else:##Cartesiano ro-teta
+        x = sorted(dizDati.keys())
+        y = valoriRaggi
+        
+    ##Disegno vero e proprio del grafico
     ax.clear()
-    ax.plot(sorted(dizDati.keys()), valoriRaggi)
+    ax.plot(x, y)
