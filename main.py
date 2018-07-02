@@ -16,10 +16,7 @@ import math
 port= easygui.enterbox("Inserisci il percorso per la porta Arduino, tipicamente /dev/ttyACM*")
 if (port == None or port == ''):
     print("Inserire una porta valida")
-
 ard = serial.Serial(port,9600,timeout=5)
-
-ard.flush()
 
 #Tipo di grafico
 tipoDiGrafico = easygui.buttonbox("Seleziona come vuoi che vengano mostrati i dati", choices=["Grafico radiale","Cartesiano r in funzione di teta"])
@@ -28,6 +25,13 @@ if tipoDiGrafico==None or tipoDiGrafico=="Cartesiano r in funzione di teta":
 else:
     tipoDiGrafico="radiale"
 
+#Modalita specchio
+modalitaSpecchio = easygui.buttonbox("Attivare modalità specchio?", choices=["Sì","No"])
+if modalitaSpecchio=="Sì":
+    modalitaSpecchio=True
+else:
+    modalitaSpecchio=False
+
 ##Grafico
 dizDati={}
 plt.ion()
@@ -35,6 +39,7 @@ fig=plt.figure()
 ax=fig.add_subplot(111)
 
 
+ard.flush()
 #Ciclo principale
 while True:
     msg = ard.readline()
@@ -65,6 +70,10 @@ while True:
         x = sorted(dizDati.keys())
         y = valoriRaggi
         
+    if modalitaSpecchio:
+        for i in range(len(x)):
+            x[i]=-x[i]
+        y.reverse()
     ##Disegno vero e proprio del grafico
     ax.clear()
     ax.plot(x, y)
