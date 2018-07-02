@@ -8,12 +8,24 @@ Created on Sat Jun 30 16:30:52 2018
 
 import serial
 import matplotlib.pyplot as plt
+import easygui
 
-dizDati={}
+#Arduino seriale
+port= easygui.enterbox("Inserisci il percorso per la porta Arduino, tipicamente /dev/ttyACM*")
+if (port == None or port == ''):
+    print("Inserire una porta valida")
 
-port=str(input("Inserire percorso interfaccia: "))
 ard = serial.Serial(port,9600,timeout=5)
+
 ard.flush()
+
+##Grafico
+dizDati={}
+plt.ion()
+fig=plt.figure()
+ax=fig.add_subplot(111)
+
+#Ciclo principale
 while True:
     msg = ard.readline()
     msg.translate(None ,b'\r\n')
@@ -32,6 +44,5 @@ while True:
     valoriRaggi = []
     for ang in sorted(dizDati.keys()):
         valoriRaggi.append(dizDati[ang])
-    plt.plot(sorted(dizDati.keys()), valoriRaggi)
-    
-    plt.show()
+    ax.clear()
+    ax.plot(sorted(dizDati.keys()), valoriRaggi)
