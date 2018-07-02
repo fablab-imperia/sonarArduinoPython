@@ -5,11 +5,26 @@ Created on Sat Jun 30 16:30:52 2018
 
 @author: rosto
 """
+import sys
+try:
+    import serial
+except ImportError:
+    print("Libreria pySerial non trovata")
+    sys.exit()
 
-import serial
-import matplotlib.pyplot as plt
-import easygui
-import math
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print("Libreria matplotlib non trovata")
+    sys.exit()
+
+try:
+    import easygui
+except ImportError:
+    print("Libreria easygui non trovata")
+    sys.exit()
+
+import math##già nelle librerie standard
 
 
 #Arduino seriale
