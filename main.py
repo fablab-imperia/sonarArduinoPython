@@ -13,9 +13,9 @@ except ImportError:
     sys.exit()
 
 try:
-    import matplotlib.pyplot as plt
+    import PyGnuplot as gp
 except ImportError:
-    print("Libreria matplotlib non trovata")
+    print("Libreria PyGnuplot non trovata")
     sys.exit()
 
 try:
@@ -25,6 +25,7 @@ except ImportError:
     sys.exit()
 
 import math##già nelle librerie standard
+import time
 
 
 #Arduino seriale
@@ -34,25 +35,22 @@ if (port == None or port == ''):
 ard = serial.Serial(port,9600,timeout=5)
 
 #Tipo di grafico
-tipoDiGrafico = easygui.buttonbox("Seleziona come vuoi che vengano mostrati i dati", choices=["Grafico radiale","Cartesiano r in funzione di teta"])
-if tipoDiGrafico==None or tipoDiGrafico=="Cartesiano r in funzione di teta":
-    tipoDiGrafico="cartesiano"
-else:
-    tipoDiGrafico="radiale"
+#tipoDiGrafico = easygui.buttonbox("Seleziona come vuoi che vengano mostrati i dati", choices=["Grafico radiale","Cartesiano r in funzione di teta"])
+#if tipoDiGrafico==None or tipoDiGrafico=="Cartesiano r in funzione di teta":
+#    tipoDiGrafico="cartesiano"
+#else:
+#    tipoDiGrafico="radiale"
+#
+##Modalita specchio
+#modalitaSpecchio = easygui.buttonbox("Attivare modalità specchio?", choices=["Sì","No"])
+#if modalitaSpecchio=="Sì":
+#    modalitaSpecchio=True
+#else:
+#    modalitaSpecchio=False
 
-#Modalita specchio
-modalitaSpecchio = easygui.buttonbox("Attivare modalità specchio?", choices=["Sì","No"])
-if modalitaSpecchio=="Sì":
-    modalitaSpecchio=True
-else:
-    modalitaSpecchio=False
-
-##Grafico
+#Grafico
 dizDati={}
-plt.ion()
-fig=plt.figure()
-ax=fig.add_subplot(111)
-
+#plt.hold(False)
 
 ard.flush()
 #Ciclo principale
@@ -77,18 +75,27 @@ while True:
        
     x=[]
     y=[]
-    if (tipoDiGrafico=="radiale"):
-        for i in range(len(valoriRaggi)):
-            x.append(valoriRaggi[i]*math.cos(sorted(dizDati.keys())[i]*math.pi/180.0))
-            y.append(valoriRaggi[i]*math.sin(sorted(dizDati.keys())[i]*math.pi/180.0))
-    else:##Cartesiano ro-teta
-        x = sorted(dizDati.keys())
-        y = valoriRaggi
-        
-    if modalitaSpecchio:
-        for i in range(len(x)):
-            x[i]=-x[i]
-        y.reverse()
+#    if (tipoDiGrafico=="radiale"):
+#        for i in range(len(valoriRaggi)):
+#            x.append(valoriRaggi[i]*math.cos(sorted(dizDati.keys())[i]*math.pi/180.0))
+#            y.append(valoriRaggi[i]*math.sin(sorted(dizDati.keys())[i]*math.pi/180.0))
+#    else:##Cartesiano ro-teta
+#        x = sorted(dizDati.keys())
+#        y = valoriRaggi
+#        
+#    if modalitaSpecchio:
+#        for i in range(len(x)):
+#            x[i]=-x[i]
+#        y.reverse()
+    x = sorted(dizDati.keys())
+    y = valoriRaggi
+    
+    #file temporaneo
+    f = open("temp.dat","w")
+    for ang in sorted(dizDati.keys()):
+        f.write(str(ang)+" "+str(dizDati[ang]))
+    f.close
+    
     ##Disegno vero e proprio del grafico
-    ax.clear()
-    ax.plot(x, y)
+    gp.c("plot 'temp.dat' using 1:2 with lines")
+    time.sleep(0.05)
