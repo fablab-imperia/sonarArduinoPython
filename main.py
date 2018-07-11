@@ -91,11 +91,12 @@ while True:
     y = valoriRaggi
     
     #file temporaneo
-    f = open("temp.dat","w")
+    f = open("temp.txt","w")
     for ang in sorted(dizDati.keys()):
-        f.write(str(ang)+" "+str(dizDati[ang]))
-    f.close
+        f.write(str(ang)+" "+str(dizDati[ang])+"\n")
+    f.flush()
+    f.close()
     
     ##Disegno vero e proprio del grafico
-    gp.c("plot 'temp.dat' using 1:2 with lines")
-    time.sleep(0.05)
+    gp.c('plot "temp.txt" using 1:2 with lines')
+    time.sleep(0.15)
