@@ -35,18 +35,11 @@ if (port == None or port == ''):
 ard = serial.Serial(port,9600,timeout=5)
 
 #Tipo di grafico
-#tipoDiGrafico = easygui.buttonbox("Seleziona come vuoi che vengano mostrati i dati", choices=["Grafico radiale","Cartesiano r in funzione di teta"])
-#if tipoDiGrafico==None or tipoDiGrafico=="Cartesiano r in funzione di teta":
-#    tipoDiGrafico="cartesiano"
-#else:
-#    tipoDiGrafico="radiale"
-#
-##Modalita specchio
-#modalitaSpecchio = easygui.buttonbox("Attivare modalità specchio?", choices=["Sì","No"])
-#if modalitaSpecchio=="Sì":
-#    modalitaSpecchio=True
-#else:
-#    modalitaSpecchio=False
+tipoDiGrafico = easygui.buttonbox("Seleziona come vuoi che vengano mostrati i dati", choices=["Grafico radiale","Cartesiano r in funzione di teta"])
+if tipoDiGrafico==None or tipoDiGrafico=="Cartesiano r in funzione di teta":
+    tipoDiGrafico="cartesiano"
+else:
+    tipoDiGrafico="radiale"
 
 #Grafico
 dizDati={}
@@ -63,10 +56,13 @@ while True:
         angolo, distanza = msg.split("-")
 #        print(type(angolo))
         distanza=distanza.replace("\r\n","")
-        angolo= int(angolo)
-        distanza=float(distanza)
-        dizDati[angolo]=distanza
-        print("Angolo "+str(angolo)+", distanza "+str(distanza))
+        try:
+            angolo= int(angolo)
+            distanza=float(distanza)
+            dizDati[angolo]=distanza
+            print("Angolo "+str(angolo)+", distanza "+str(distanza))
+        except:
+            pass
     else:
         pass
     valoriRaggi = []
@@ -75,25 +71,20 @@ while True:
        
     x=[]
     y=[]
-#    if (tipoDiGrafico=="radiale"):
-#        for i in range(len(valoriRaggi)):
-#            x.append(valoriRaggi[i]*math.cos(sorted(dizDati.keys())[i]*math.pi/180.0))
-#            y.append(valoriRaggi[i]*math.sin(sorted(dizDati.keys())[i]*math.pi/180.0))
-#    else:##Cartesiano ro-teta
-#        x = sorted(dizDati.keys())
-#        y = valoriRaggi
-#        
-#    if modalitaSpecchio:
-#        for i in range(len(x)):
-#            x[i]=-x[i]
-#        y.reverse()
-    x = sorted(dizDati.keys())
-    y = valoriRaggi
+    if (tipoDiGrafico=="radiale"):
+        for ang in sorted(dizDati.keys()):
+            x.append( math.cos(ang/180.0*math.pi) * dizDati[ang]   )
+            y.append( math.sin(ang/180.0*math.pi) * dizDati[ang]   )  
+        y.reverse()
+    else:##Cartesiano ro-teta
+        x = sorted(dizDati.keys())
+        y = valoriRaggi
+
     
     #file temporaneo
     f = open("temp.txt","w")
-    for ang in sorted(dizDati.keys()):
-        f.write(str(ang)+" "+str(dizDati[ang])+"\n")
+    for i in range(len(x)):
+        f.write(str(x[i])+" "+str(y[i])+"\n")
     f.flush()
     f.close()
     
